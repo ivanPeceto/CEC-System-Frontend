@@ -1,0 +1,85 @@
+<div class="min-h-screen w-full lg:grid lg:grid-cols-2 bg-zinc-950 text-white">
+  
+  <div class="relative flex flex-col justify-center items-center px-6 py-12 lg:px-8 h-screen">
+    
+    <div class="absolute top-6 left-6 flex items-center gap-2 font-semibold text-zinc-100">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+        <path d="M2 17l10 5 10-5"></path>
+        <path d="M2 12l10 5 10-5"></path>
+      </svg>
+      <span>Como en Casa</span>
+    </div>
+
+    <div class="w-full max-w-sm mx-auto">
+      
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-bold tracking-tight text-white">Iniciar Sesión</h1>
+        <p class="text-sm text-zinc-400 mt-2">Sistema de gestión de rotisería.</p>
+      </div>
+
+      <form [formGroup]="loginForm" class="space-y-4" (submit)="handleSubmit()">
+        <div>
+          <label for="email" class="block text-sm font-medium text-zinc-200 mb-1">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            formControlName="email"
+            placeholder="ejemplo@gmail.com"
+            class="block w-full rounded-md border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-white placeholder-zinc-500 focus:border-white focus:outline-none focus:ring-1 focus:ring-white sm:text-sm"
+            required
+          >
+          @if (loginForm.controls.email.invalid && loginForm.controls.email.touched) {
+            <span>Hay un problema con el email.</span>
+          }
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-zinc-200 mb-1">Contraseña</label>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            name="password"
+            class="block w-full rounded-md border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white sm:text-sm"
+            required
+          >
+        </div>
+
+        <button
+          type="submit"
+          class="w-full mt-6 flex justify-center rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-zinc-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-colors"
+          [disabled]="!loginForm.valid"
+          >
+          Iniciar Sesión
+        </button>
+      </form>
+
+      <div class="mt-6 text-center text-sm text-zinc-400">
+        No tienes una cuenta?
+        <a routerLink="/signup" class="font-medium text-white underline hover:text-zinc-300 underline-offset-4">Registrate</a>
+      </div>
+      
+      @if (errorMessage) {
+        <div class="mt-6 text-center text-sm text-red-400">
+          {{errorMessage}}
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="hidden lg:block relative h-screen w-full overflow-hidden bg-zinc-950">
+     
+     <div class="absolute inset-0 z-10 bg-[radial-gradient(#3f3f46_1px,transparent_1px)] [background-size:24px_24px] opacity-40"></div>
+     
+     <div class="absolute inset-0 z-20 bg-[radial-gradient(circle,transparent_50%,var(--color-zinc-950)_110%)] pointer-events-none"></div>
+     
+     <img 
+        src="/images/login-image.jpg" 
+        alt="Fondo de cocina rotisería"
+        class="absolute inset-0 w-full h-full object-cover z-0 animate-pan-fade"
+     >
+     
+  </div>
+</div>

@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  
+
+  /* Variables de la marca Como en Casa */
+  --color-brand-bg: var(--color-zinc-950);
+  --color-brand-surface: #121214; /* Un zinc-900 más profundo */
+  --color-brand-accent: var(--color-white);
+  --color-brand-text-secondary: var(--color-zinc-400);
+
+  /* 24 seconds  animation for login page */
+  --animate-pan-fade: pan-fade 24s ease-in-out infinite;
+  @keyframes pan-fade {
+    /* Fade In */
+    0% { opacity: 0; object-position: 50% 50%; }
+    5% { opacity: 1; object-position: 50% 50%; }
+    
+    /* Left end, Fade Out */
+    45% { opacity: 1; object-position: 0% 50%; }
+    49% { opacity: 0; object-position: 0% 50%; }
+
+    /* Centered, Fade In */
+    50% { opacity: 0; object-position: 50% 50%; }
+    51% { opacity: 1; object-position: 50% 50%; }
+
+    /* Right end, Fade Out */
+    95% { opacity: 1; object-position: 100% 50%; }
+    100% { opacity: 0; object-position: 100% 50%; }
+  }
+}
+
+html, body {
+  height: 100%;
+  background-color: black;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; 
+}
