@@ -2,14 +2,7 @@ import { Component, computed, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule, Search, Pen, Trash2, Trash } from 'lucide-angular';
-
-export interface Cliente {
-  id: string;
-  nombre: string;
-  telefono?: string;
-  direccion?: string;
-  deletedAt?: Date | null;
-}
+import { Cliente } from '../../../../interfaces/clientes/cliente.interface';
 
 @Component({
   selector: 'app-clientes-managment',
