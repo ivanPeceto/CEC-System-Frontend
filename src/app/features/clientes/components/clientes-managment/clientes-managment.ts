@@ -6,6 +6,7 @@ import { Cliente } from '../../../../interfaces/clientes/cliente.interface';
 import { ClientesService } from '../../services/clientes-service';
 import { AuthService } from '../../../../core/auth/services/auth-service';
 import { CreateClienteDto } from '../../../../interfaces/clientes/createCliente.dto';
+import { UiService } from '../../../../core/ui/services/ui.service';
 
 @Component({
   selector: 'app-clientes-managment',
@@ -18,6 +19,7 @@ export class ClientesManagment implements OnInit {
   private fb = inject(FormBuilder);
   private clienteService = inject(ClientesService);
   private authService = inject(AuthService);
+  private ui = inject(UiService);
 
   // Icons
   readonly Search = Search;
@@ -62,6 +64,7 @@ export class ClientesManagment implements OnInit {
       
       this.clienteService.createCliente(createClienteDto);
       this.clienteForm.reset();
+      this.ui.showSuccess('Exito', 'Cliente creado exitosamente.')
     }
   }
 
