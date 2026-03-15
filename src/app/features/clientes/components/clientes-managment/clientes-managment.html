@@ -27,7 +27,7 @@
             type="text" 
             formControlName="nombre"
             class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all"
-            placeholder="Ej. Juan Pérez"
+            placeholder=""
             />
         </div>
 
@@ -38,7 +38,7 @@
             type="text" 
             formControlName="telefono"
             class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all"
-            placeholder="Ej. +54 9 11 1234-5678"
+            placeholder=""
             />
         </div>
 
@@ -49,7 +49,7 @@
             type="text" 
             formControlName="direccion"
             class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all"
-            placeholder="Ej. Av. Siempre Viva 742"
+            placeholder=""
             />
         </div>
 
@@ -89,13 +89,13 @@
                 </button>
                 
                 <button 
-                    (click)="onRemove(cliente)" 
+                    (click)="onSoftDelete(cliente)" 
                     title="Remover"
                     class="p-2 text-red-400 hover:bg-red-400/10 hover:text-red-300 rounded-md transition-colors">
                     <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
                 </button>
 
-                @if (currentUser().role === 'admin') {
+                @if (currentUser()?.rol === 'admin') {
                     <button 
                     (click)="onHardDelete(cliente)" 
                     title="Eliminar Definitivamente"

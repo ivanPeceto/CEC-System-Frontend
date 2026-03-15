@@ -5,13 +5,15 @@ import { SignInDto } from '../../../interfaces/auth/sign-in.dto';
 import { User } from '../../../interfaces/auth/user';
 import { SignUpDto } from '../../../interfaces/auth/sign-up.dto';
 
-const API_URL = (window as any).__env.apiUrl;
-
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private authUrl = API_URL + '/auth';
+  private get apiUrl(): string {
+    return (window as any).__env?.apiUrl || 'http://localhost:3000';
+  }
+
+  private authUrl = `${this.apiUrl}` + '/auth';
 
   private http = inject(HttpClient);
   currentUser = signal<User | undefined | null>(undefined);
