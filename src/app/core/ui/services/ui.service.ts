@@ -23,6 +23,10 @@ export class UiService {
     this.state.set({ isOpen: true, title, message, type: ModalType.ALERT });
   }
 
+  showSuccess(title: string, message: string): void {
+    this.state.set({ isOpen: true, title, message, type: ModalType.SUCCESS });
+  }
+
   showConfirm(title: string, message: string): Promise<boolean> {
     this.state.set({ isOpen: true, title, message, type: ModalType.CONFIRM });
 

@@ -20,7 +20,8 @@ import {
   Trash2,
   XCircle,
   AlertTriangle,
-  Info
+  Info,
+  CircleCheck,
 } from 'lucide-angular';
 
 export function initializeApp(authService: AuthService) {
@@ -58,6 +59,7 @@ export const appConfig: ApplicationConfig = {
         XCircle,
         AlertTriangle,
         Info,
+        CircleCheck,
       })
     ),
   ]
