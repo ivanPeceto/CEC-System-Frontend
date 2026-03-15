@@ -1,1 +1,45 @@
-<p>global-modal works!</p>
+@if (ui.state().isOpen) {
+<div 
+   class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in"
+   >
+   <div 
+      class="relative w-full max-w-sm p-6 text-center bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl animate-zoom-in"
+      (click)="$event.stopPropagation()" 
+      >
+      <div class="flex justify-center mb-4">
+         @switch (ui.state().type) {
+         @case ('error') {
+         <lucide-icon name="x-circle" class="w-16 h-16 text-red-500 animate-pulse"></lucide-icon>
+         }
+         @case ('alert') {
+         <lucide-icon name="alert-triangle" class="w-16 h-16 text-yellow-500 animate-bounce"></lucide-icon>
+         }
+         @case ('confirm') {
+         <lucide-icon name="info" class="w-16 h-16 text-blue-400"></lucide-icon>
+         }
+         }
+      </div>
+      <h3 class="text-xl font-bold text-white">{{ ui.state().title }}</h3>
+      <p class="mt-2 text-sm text-zinc-400">{{ ui.state().message }}</p>
+      <div class="mt-6 flex gap-3 w-full" [class.flex-col]="ui.state().type !== 'confirm'">
+         @if (ui.state().type === 'confirm') {
+         <button 
+            class="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-transparent border border-zinc-700 rounded-xl hover:bg-zinc-800 transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-600"
+            (click)="ui.closeModal(false)"
+            >
+         Cancelar
+         </button>
+         }
+         <button 
+         class="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl transition-all focus:outline-none focus:ring-2"
+         [class]="ui.state().type === 'error' 
+         ? 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500/50' 
+         : 'bg-white text-zinc-950 hover:bg-zinc-200 focus:ring-white/50'"
+         (click)="ui.closeModal(true)"
+         >
+         {{ ui.state().type === 'confirm' ? 'Confirmar' : 'Aceptar' }}
+         </button>
+      </div>
+   </div>
+</div>
+}

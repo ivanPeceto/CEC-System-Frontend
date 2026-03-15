@@ -17,7 +17,10 @@ import {
   Search,
   Pen,
   Trash,
-  Trash2
+  Trash2,
+  XCircle,
+  AlertTriangle,
+  Info
 } from 'lucide-angular';
 
 export function initializeApp(authService: AuthService) {
@@ -52,6 +55,9 @@ export const appConfig: ApplicationConfig = {
         Pen,
         Trash,
         Trash2,
+        XCircle,
+        AlertTriangle,
+        Info,
       })
     ),
   ]
