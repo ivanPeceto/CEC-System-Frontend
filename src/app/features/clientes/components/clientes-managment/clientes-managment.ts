@@ -7,6 +7,7 @@ import { ClientesService } from '../../services/clientes-service';
 import { AuthService } from '../../../../core/auth/services/auth-service';
 import { CreateClienteDto } from '../../../../interfaces/clientes/createCliente.dto';
 import { UpdateClienteDto } from '../../../../interfaces/clientes/updateCliente.dto';
+import { Roles } from '../../../../types/roles';
 
 @Component({
   selector: 'app-clientes-managment',
@@ -20,8 +21,10 @@ export class ClientesManagment implements OnInit {
   private clienteService = inject(ClientesService);
   private authService = inject(AuthService);
 
+  isOnSoftDeletedClientes = signal<boolean>(false);
   isEditingCliente = signal<boolean>(false);
   editingClienteId: string | null = null;
+
 
   // Icons
   readonly Search = Search;
@@ -30,17 +33,21 @@ export class ClientesManagment implements OnInit {
   readonly Trash = Trash;
   //
   
-  // Mocks
   currentUser = this.authService.currentUser; 
   clientes = this.clienteService.clientes;
-  //
+  softDeletedClientes = this.clienteService.softDeletedClientes;
 
   searchQuery = signal('');
 
   filteredClientes = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
-    if (!query) return this.clientes();
-    return this.clientes().filter(c => c.nombre.toLowerCase().includes(query));
+    if (this.currentUser()?.rol === Roles.ADMIN && this.isOnSoftDeletedClientes()) {
+      if (!query) return this.softDeletedClientes();
+      return this.softDeletedClientes().filter(c => c.nombre.toLowerCase().includes(query));
+    } else {
+      if (!query) return this.clientes();
+      return this.clientes().filter(c => c.nombre.toLowerCase().includes(query));
+    }
   });
 
   clienteForm!: FormGroup;
@@ -65,9 +72,9 @@ export class ClientesManagment implements OnInit {
         const updateClienteDto: UpdateClienteDto =
           this.clienteForm.value;
         
-          this.clienteService.updateCliente(this.editingClienteId, updateClienteDto);
-          this.clienteForm.reset();
-          this.cancelEdit();
+        this.clienteService.updateCliente(this.editingClienteId, updateClienteDto);
+        this.clienteForm.reset();
+        this.cancelEdit();
       } else {
         const createClienteDto: CreateClienteDto = 
           this.clienteForm.value;
@@ -100,5 +107,13 @@ export class ClientesManagment implements OnInit {
 
   async onHardDelete(cliente: Cliente): Promise<void> {
     await this.clienteService.hardDeleteCliente(cliente.id);
+  }
+
+  async onRestore(cliente: Cliente): Promise<void> {
+    await this.clienteService.restoreCliente(cliente.id);
+  }
+
+  onToggleSoftDeleted() {
+    this.isOnSoftDeletedClientes.set(!this.isOnSoftDeletedClientes());
   }
 }

@@ -22,6 +22,7 @@ export class ClientesService {
   private ui = inject(UiService);
 
   private readonly _clientes = signal<Cliente[]>([]);
+  private readonly _softDeltedClientes = signal<Cliente[]>([]);
   private readonly _isLoading = signal<boolean>(false);
 
   public readonly clientes = this._clientes.asReadonly();
@@ -30,9 +31,13 @@ export class ClientesService {
     const user = this.authService.currentUser();
     return user?.rol === Roles.ADMIN;
   });
+  public readonly softDeletedClientes = this._softDeltedClientes.asReadonly();
 
   constructor() {
     this.loadClientes();
+    if (this.isAdmin()) {
+      this.loadSoftDeletedClientes();
+    } 
   }
 
   loadClientes() {
@@ -47,6 +52,22 @@ export class ClientesService {
         this.ui.showError('Error al cargar clientes', err.message || 'Ocurrió un  error inesperado.');
       }
     });
+  }
+
+  loadSoftDeletedClientes() {
+    if (this.isAdmin()) {
+      return this.http.get<Cliente[]>(`${this.clientesUrl}/deleted`).subscribe({
+        next: (data) => {
+          this._softDeltedClientes.set(data);
+        },
+        error: (err) => {
+          this.ui.showError('Error al cargar clientes borrados', err.message || 'Ocurrió un error inesperado');
+        }
+      });
+    } else {
+      this._softDeltedClientes.set([]);
+      return;
+    }
   }
 
   createCliente(createClienteDto: CreateClienteDto) {
@@ -82,7 +103,11 @@ export class ClientesService {
     }  
     return this.http.delete(`${this.clientesUrl}/${id}`).subscribe({
       next: () => {
+        const cliente = this._clientes().find((c) => c.id === id);
         this._clientes.update(clientes => clientes.filter(c => c.id !== id));
+        if (cliente) {
+          this._softDeltedClientes.update(clientes => [cliente, ...clientes])
+        }
       },
       error: (err) => {
         this.ui.showError('Error al remover cliente', err.message || 'Ocurrió un  error inesperado.')
@@ -100,6 +125,9 @@ export class ClientesService {
       return this.http.delete(`${this.clientesUrl}/${id}/hard`).subscribe({
         next: () => {
           this._clientes.update(clientes => clientes.filter(c => c.id !== id));
+          if (this._softDeltedClientes.length > 0) {
+            this._softDeltedClientes.update(clientes => clientes.filter(c => c.id !== id));
+          }
         },
         error: (err) => {
           this.ui.showError('Error al eliminar definitivamente el cliente', err.message || 'Ocurrió un  error inesperado.');
@@ -119,7 +147,13 @@ export class ClientesService {
     if (this.isAdmin()) {
       return this.http.patch<Cliente>(`${this.clientesUrl}/restore/${id}`, {}).subscribe({
         next: (data) => {
-          this._clientes.update(clientes => [data, ...clientes]);
+          const cliente = this._softDeltedClientes().find((c) => c.id === id);
+          if (cliente) {
+            this._clientes.update(clientes => [cliente, ...clientes]);
+          }
+          if (this._softDeltedClientes().length > 0) {
+            this._softDeltedClientes.update(clientes => clientes.filter(c => c.id !== id));
+          }
         },
         error: (err) => {
           this.ui.showError('Error al restaurar cliente', err.message || 'Ocurrió un  error inesperado.');

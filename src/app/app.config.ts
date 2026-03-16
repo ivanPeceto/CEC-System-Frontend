@@ -22,6 +22,7 @@ import {
   AlertTriangle,
   Info,
   CircleCheck,
+  History,
 } from 'lucide-angular';
 
 export function initializeApp(authService: AuthService) {
@@ -60,6 +61,7 @@ export const appConfig: ApplicationConfig = {
         AlertTriangle,
         Info,
         CircleCheck,
+        History,
       })
     ),
   ]
