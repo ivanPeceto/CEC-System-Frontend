@@ -6,7 +6,7 @@ import { Cliente } from '../../../../interfaces/clientes/cliente.interface';
 import { ClientesService } from '../../services/clientes-service';
 import { AuthService } from '../../../../core/auth/services/auth-service';
 import { CreateClienteDto } from '../../../../interfaces/clientes/createCliente.dto';
-import { UiService } from '../../../../core/ui/services/ui.service';
+import { UpdateClienteDto } from '../../../../interfaces/clientes/updateCliente.dto';
 
 @Component({
   selector: 'app-clientes-managment',
@@ -19,7 +19,9 @@ export class ClientesManagment implements OnInit {
   private fb = inject(FormBuilder);
   private clienteService = inject(ClientesService);
   private authService = inject(AuthService);
-  private ui = inject(UiService);
+
+  isEditingCliente = signal<boolean>(false);
+  editingClienteId: string | null = null;
 
   // Icons
   readonly Search = Search;
@@ -59,24 +61,44 @@ export class ClientesManagment implements OnInit {
 
   onSubmit(): void {
     if (this.clienteForm.valid) {
-      const createClienteDto: CreateClienteDto = 
-        this.clienteForm.value;
-      
-      this.clienteService.createCliente(createClienteDto);
-      this.clienteForm.reset();
-      this.ui.showSuccess('Exito', 'Cliente creado exitosamente.')
+      if (this.isEditingCliente() && typeof this.editingClienteId === 'string') {
+        const updateClienteDto: UpdateClienteDto =
+          this.clienteForm.value;
+        
+          this.clienteService.updateCliente(this.editingClienteId, updateClienteDto);
+          this.clienteForm.reset();
+          this.cancelEdit();
+      } else {
+        const createClienteDto: CreateClienteDto = 
+          this.clienteForm.value;
+        
+        this.clienteService.createCliente(createClienteDto);
+        this.clienteForm.reset();
+      }
     }
   }
 
-  onEdit(cliente: Cliente): void {
-    // Display edit modal when implemented
+  async onEdit(cliente: Cliente): Promise<void> {
+    this.isEditingCliente.set(true);
+    this.editingClienteId = cliente.id;
+
+    this.clienteForm.patchValue({
+      nombre: cliente.nombre,
+      telefono: cliente.telefono,
+      direccion: cliente.direccion,
+    });
   }
 
-  onSoftDelete(cliente: Cliente): void {
-    this.clienteService.softDeleteCliente(cliente.id);
+  cancelEdit(): void {
+    this.isEditingCliente.set(false);
+    this.editingClienteId = null;
   }
 
-  onHardDelete(cliente: Cliente): void {
-    this.clienteService.hardDeleteCliente(cliente.id);
+  async onSoftDelete(cliente: Cliente): Promise<void> {
+    await this.clienteService.softDeleteCliente(cliente.id);
+  }
+
+  async onHardDelete(cliente: Cliente): Promise<void> {
+    await this.clienteService.hardDeleteCliente(cliente.id);
   }
 }

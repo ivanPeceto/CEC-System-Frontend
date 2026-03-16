@@ -5,6 +5,7 @@ import { CreateClienteDto } from '../../../interfaces/clientes/createCliente.dto
 import { UpdateClienteDto } from '../../../interfaces/clientes/updateCliente.dto';
 import { AuthService } from '../../../core/auth/services/auth-service';
 import { Roles } from '../../../types/roles';
+import { UiService } from '../../../core/ui/services/ui.service';
 
 
 @Injectable({
@@ -18,6 +19,7 @@ export class ClientesService {
   private clientesUrl = `${this.apiUrl}` +  '/clientes';
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+  private ui = inject(UiService);
 
   private readonly _clientes = signal<Cliente[]>([]);
   private readonly _isLoading = signal<boolean>(false);
@@ -42,8 +44,7 @@ export class ClientesService {
       },
       error: (err) => {
         this._isLoading.set(false);
-        console.log("Error", err);
-        // Complete when error component is implemented
+        this.ui.showError('Error al cargar clientes', err.message || 'Ocurrió un  error inesperado.');
       }
     });
   }
@@ -52,9 +53,10 @@ export class ClientesService {
     return this.http.post<Cliente>(`${this.clientesUrl}`, createClienteDto).subscribe({
       next: (data) => {
         this._clientes.update(clientes => [data, ...clientes]);
+        this.ui.showSuccess('Exito', 'Cliente creado exitosamente.');
       },
-      error: (err) => {
-        // Complete when error component is implemented
+      error: (err) => {`${err}`
+        this.ui.showError('Error al crear cliente', err.message || 'Ocurrió un  error inesperado.');
       },
     });
   }
@@ -63,54 +65,69 @@ export class ClientesService {
     return this.http.patch<Cliente>(`${this.clientesUrl}/${id}`, updateClienteDto)
     .subscribe({
       next: (data) => {
+        this._clientes.update(clientes => clientes.filter(c => c.id !== id));
         this._clientes.update(clientes => [data, ...clientes]);
+        this.ui.showSuccess('Exito', 'Cliente actualizado exitosamente.');
       },
       error: (err) => {
-        // Complete when error component is implemented
+        this.ui.showError('Error al actualizar cliente', err.message || 'Ocurrió un  error inesperado.');
       },
     });
   }
 
-  softDeleteCliente(id: string) {
+  async softDeleteCliente(id: string) {
+    const confirmed = await this.ui.showConfirm('Atención', '¿Está seguro de remover el cliente?');
+    if (!confirmed) {
+      return;
+    }  
     return this.http.delete(`${this.clientesUrl}/${id}`).subscribe({
       next: () => {
         this._clientes.update(clientes => clientes.filter(c => c.id !== id));
       },
       error: (err) => {
-        // Complete when error component is implemented
+        this.ui.showError('Error al remover cliente', err.message || 'Ocurrió un  error inesperado.')
       }
     });
   }
 
-  hardDeleteCliente(id: string) {
+  async hardDeleteCliente(id: string) {
+    const confirmed = await this.ui.showConfirm('Atención', '¿Está seguro de remover definitivamente el cliente?');
+    if (!confirmed) {
+      return;
+    }
+
     if (this.isAdmin()) {
       return this.http.delete(`${this.clientesUrl}/${id}/hard`).subscribe({
         next: () => {
           this._clientes.update(clientes => clientes.filter(c => c.id !== id));
         },
         error: (err) => {
-          // Complete when error component is implemented
+          this.ui.showError('Error al eliminar definitivamente el cliente', err.message || 'Ocurrió un  error inesperado.');
         }
       });
     } else {
+      this.ui.showError('Error', 'No tienes los permisos para realizar esta accion.');
       return;
-      // Complete when error component is implemented
     }
   }
 
-  restoreCliente(id: string) {
+  async restoreCliente(id: string) {
+    const confirmed = await this.ui.showConfirm('Atención', '¿Está seguro de restaurar el cliente?');
+    if (!confirmed) {
+      return;
+    }
     if (this.isAdmin()) {
       return this.http.patch<Cliente>(`${this.clientesUrl}/restore/${id}`, {}).subscribe({
         next: (data) => {
           this._clientes.update(clientes => [data, ...clientes]);
         },
         error: (err) => {
-          // Complete when error component is implemented
+          this.ui.showError('Error al restaurar cliente', err.message || 'Ocurrió un  error inesperado.');
         }
       });
     } else {
+      this.ui.showError('Error', 'No tienes los permisos para realizar esta accion');
       return;
-      // Complete when error component is implemented
     }
   }
 }
