@@ -6,6 +6,8 @@ import { Cliente } from '../../../../interfaces/clientes/cliente.interface';
 import { ClientesService } from '../../services/clientes-service';
 import { AuthService } from '../../../../core/auth/services/auth-service';
 import { CreateClienteDto } from '../../../../interfaces/clientes/createCliente.dto';
+import { UpdateClienteDto } from '../../../../interfaces/clientes/updateCliente.dto';
+import { Roles } from '../../../../types/roles';
 
 @Component({
   selector: 'app-clientes-managment',
@@ -19,6 +21,11 @@ export class ClientesManagment implements OnInit {
   private clienteService = inject(ClientesService);
   private authService = inject(AuthService);
 
+  isOnSoftDeletedClientes = signal<boolean>(false);
+  isEditingCliente = signal<boolean>(false);
+  editingClienteId: string | null = null;
+
+
   // Icons
   readonly Search = Search;
   readonly Pen = Pen;
@@ -26,17 +33,21 @@ export class ClientesManagment implements OnInit {
   readonly Trash = Trash;
   //
   
-  // Mocks
   currentUser = this.authService.currentUser; 
   clientes = this.clienteService.clientes;
-  //
+  softDeletedClientes = this.clienteService.softDeletedClientes;
 
   searchQuery = signal('');
 
   filteredClientes = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
-    if (!query) return this.clientes();
-    return this.clientes().filter(c => c.nombre.toLowerCase().includes(query));
+    if (this.currentUser()?.rol === Roles.ADMIN && this.isOnSoftDeletedClientes()) {
+      if (!query) return this.softDeletedClientes();
+      return this.softDeletedClientes().filter(c => c.nombre.toLowerCase().includes(query));
+    } else {
+      if (!query) return this.clientes();
+      return this.clientes().filter(c => c.nombre.toLowerCase().includes(query));
+    }
   });
 
   clienteForm!: FormGroup;
@@ -57,23 +68,52 @@ export class ClientesManagment implements OnInit {
 
   onSubmit(): void {
     if (this.clienteForm.valid) {
-      const createClienteDto: CreateClienteDto = 
-        this.clienteForm.value;
-      
-      this.clienteService.createCliente(createClienteDto);
-      this.clienteForm.reset();
+      if (this.isEditingCliente() && typeof this.editingClienteId === 'string') {
+        const updateClienteDto: UpdateClienteDto =
+          this.clienteForm.value;
+        
+        this.clienteService.updateCliente(this.editingClienteId, updateClienteDto);
+        this.clienteForm.reset();
+        this.cancelEdit();
+      } else {
+        const createClienteDto: CreateClienteDto = 
+          this.clienteForm.value;
+        
+        this.clienteService.createCliente(createClienteDto);
+        this.clienteForm.reset();
+      }
     }
   }
 
-  onEdit(cliente: Cliente): void {
-    // Display edit modal when implemented
+  async onEdit(cliente: Cliente): Promise<void> {
+    this.isEditingCliente.set(true);
+    this.editingClienteId = cliente.id;
+
+    this.clienteForm.patchValue({
+      nombre: cliente.nombre,
+      telefono: cliente.telefono,
+      direccion: cliente.direccion,
+    });
   }
 
-  onSoftDelete(cliente: Cliente): void {
-    this.clienteService.softDeleteCliente(cliente.id);
+  cancelEdit(): void {
+    this.isEditingCliente.set(false);
+    this.editingClienteId = null;
   }
 
-  onHardDelete(cliente: Cliente): void {
-    this.clienteService.hardDeleteCliente(cliente.id);
+  async onSoftDelete(cliente: Cliente): Promise<void> {
+    await this.clienteService.softDeleteCliente(cliente.id);
+  }
+
+  async onHardDelete(cliente: Cliente): Promise<void> {
+    await this.clienteService.hardDeleteCliente(cliente.id);
+  }
+
+  async onRestore(cliente: Cliente): Promise<void> {
+    await this.clienteService.restoreCliente(cliente.id);
+  }
+
+  onToggleSoftDeleted() {
+    this.isOnSoftDeletedClientes.set(!this.isOnSoftDeletedClientes());
   }
 }

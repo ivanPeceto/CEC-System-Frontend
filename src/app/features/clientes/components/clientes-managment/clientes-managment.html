@@ -1,118 +1,161 @@
-<div class="flex flex-col h-full max-h-[calc(100vh-50px)] w-full text-zinc-100 gap-6">
+<div class="flex flex-col h-full w-full text-zinc-100 gap-6 p-1">
 
-    <header class="w-full max-w-md relative">
+  <header class="w-full relative shrink-0 flex justify-between">
     <lucide-icon 
-        name="search" 
-        class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-5 h-5 pointer-events-none">
+      name="search" 
+      class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-5 h-5 pointer-events-none">
     </lucide-icon>
     <input 
-        type="text" 
-        (input)="onSearch($event)"
-        placeholder="Buscar cliente por nombre..." 
-        class="ml-2 w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2 pl-10 pr-4 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-transparent transition-all"
+      type="text" 
+      (input)="onSearch($event)"
+      placeholder="Buscar cliente por nombre..." 
+      class="pl-12 max-w-md w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2 pr-4 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-transparent transition-all"
     />
-    </header>
+    @if (currentUser()?.rol === 'admin') {
+    <button
+      class="flex-1 max-w-sm bg-transparent border border-zinc-700 text-zinc-300 font-semibold py-2.5 rounded-lg hover:bg-zinc-800 transition-colors"
+      type="button" 
+      (click)="onToggleSoftDeleted()"
+    >
+      {{isOnSoftDeletedClientes()? 'Ver clientes activos' : 'Ver clientes removidos'}}
+    </button>
+    }
+  </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
+  <div class="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
 
-    <aside class="lg:col-span-1 bg-zinc-900/40 border border-zinc-800/60 rounded-xl p-5 h-fit shadow-sm">
-        <h2 class="text-lg font-semibold mb-5 text-white">Nuevo Cliente</h2>
-        
-        <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <aside 
+      class="w-full lg:w-1/3 shrink-0 rounded-xl p-5 h-fit shadow-sm transition-colors duration-300"
+      [class]="isEditingCliente() 
+        ? 'bg-blue-950/20 border border-blue-900/50' 
+        : 'bg-zinc-900/40 border border-zinc-800/60'"
+    >
+      <h2 
+        class="text-lg font-semibold mb-5 transition-colors"
+        [class]="isEditingCliente() ? 'text-blue-400' : 'text-white'"
+      >
+        {{ isEditingCliente() ? 'Editando Cliente' : 'Nuevo Cliente' }}
+      </h2>
+      
+      <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
         
         <div class="flex flex-col gap-1.5">
-            <label for="nombre" class="text-sm font-medium text-zinc-300">Nombre <span class="text-red-400">*</span></label>
-            <input 
+          <label for="nombre" class="text-sm font-medium text-zinc-300">
+            Nombre <span class="text-red-400">*</span>
+          </label>
+          <input 
             id="nombre" 
             type="text" 
             formControlName="nombre"
-            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all"
-            placeholder=""
-            />
+            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          />
         </div>
 
         <div class="flex flex-col gap-1.5">
-            <label for="telefono" class="text-sm font-medium text-zinc-300">Teléfono</label>
-            <input 
+          <label for="telefono" class="text-sm font-medium text-zinc-300">Teléfono</label>
+          <input 
             id="telefono" 
             type="text" 
             formControlName="telefono"
-            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all"
-            placeholder=""
-            />
+            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          />
         </div>
 
         <div class="flex flex-col gap-1.5">
-            <label for="direccion" class="text-sm font-medium text-zinc-300">Dirección</label>
-            <input 
+          <label for="direccion" class="text-sm font-medium text-zinc-300">Dirección</label>
+          <input 
             id="direccion" 
             type="text" 
             formControlName="direccion"
-            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all"
-            placeholder=""
-            />
+            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          />
         </div>
 
-        <button 
+        <div class="mt-4 flex gap-3 w-full">
+          @if (isEditingCliente()) {
+            <button 
+              type="button" 
+              (click)="cancelEdit()"
+              class="flex-1 bg-transparent border border-zinc-700 text-zinc-300 font-semibold py-2.5 rounded-lg hover:bg-zinc-800 transition-colors">
+              Cancelar
+            </button>
+          }
+          
+          <button 
             type="submit" 
             [disabled]="clienteForm.invalid"
-            class="mt-4 w-full bg-white text-zinc-950 font-semibold py-2.5 rounded-lg hover:bg-zinc-200 disabled:opacity-50 disabled:hover:bg-white disabled:cursor-not-allowed transition-colors">
-            Guardar Cliente
-        </button>
-        </form>
+            class="flex-1 font-semibold py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            [class]="isEditingCliente() 
+              ? 'bg-blue-600 text-white hover:bg-blue-700 disabled:hover:bg-blue-600' 
+              : 'bg-white text-zinc-950 hover:bg-zinc-200 disabled:hover:bg-white'">
+            {{ isEditingCliente() ? 'Actualizar' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
     </aside>
 
-    <main class="lg:col-span-2 flex flex-col bg-zinc-900/20 border border-zinc-800/50 rounded-xl overflow-hidden shadow-sm">
-        
-        <div class="px-5 py-4 border-b border-zinc-800/50 bg-zinc-900/40">
+    <main class="w-full lg:w-2/3 flex flex-col flex-1 min-h-[400px] lg:min-h-0 bg-zinc-900/20 border border-zinc-800/50 rounded-xl overflow-hidden shadow-sm">
+      
+      <div class="px-5 py-4 border-b border-zinc-800/50 bg-zinc-900/40 shrink-0">
         <h2 class="text-lg font-semibold text-white">Directorio de Clientes</h2>
-        </div>
+      </div>
 
-        <div class="flex-1 overflow-y-auto">
+      <div class="flex-1 overflow-y-auto">
         <div class="flex flex-col">
-            @for (cliente of filteredClientes(); track cliente.id) {
+          @for (cliente of filteredClientes(); track cliente.id) {
             <div class="flex items-center justify-between p-4 border-b border-zinc-800/30 even:bg-zinc-900/30 odd:bg-transparent hover:bg-zinc-800/20 transition-colors">
-                
-                <div class="flex flex-col pr-4">
+              
+              <div class="flex flex-col pr-4">
                 <span class="font-medium text-zinc-100 text-base">{{ cliente.nombre }}</span>
                 <span class="text-sm text-zinc-400 mt-0.5">
-                    {{ cliente.telefono || 'Sin teléfono' }} • {{ cliente.direccion || 'Sin dirección' }}
+                  {{ cliente.telefono || 'Sin teléfono' }} • {{ cliente.direccion || 'Sin dirección' }}
                 </span>
-                </div>
+              </div>
 
-                <div class="flex items-center gap-2 shrink-0">
-                <button 
+              <div class="flex items-center gap-2 shrink-0">
+                @if (!isOnSoftDeletedClientes()) {
+                  <button 
                     (click)="onEdit(cliente)" 
                     title="Editar"
                     class="p-2 text-blue-400 hover:bg-blue-400/10 hover:text-blue-300 rounded-md transition-colors">
                     <lucide-icon name="pen" class="w-4 h-4"></lucide-icon>
-                </button>
-                
-                <button 
+                  </button>
+                  
+                  <button 
                     (click)="onSoftDelete(cliente)" 
                     title="Remover"
                     class="p-2 text-red-400 hover:bg-red-400/10 hover:text-red-300 rounded-md transition-colors">
                     <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
-                </button>
-
+                  </button>
+                }
+                @if (isOnSoftDeletedClientes()) {
+                  <button 
+                    (click)="onRestore(cliente)" 
+                    title="Restaurar"
+                    class="p-2 ml-1 bg-green-600/90 text-white hover:bg-green-500 rounded-md shadow-sm transition-colors">
+                    <lucide-icon name="history" class="w-4 h-4"></lucide-icon>
+                  </button>
+                }
+                
                 @if (currentUser()?.rol === 'admin') {
-                    <button 
+                  <button 
                     (click)="onHardDelete(cliente)" 
                     title="Eliminar Definitivamente"
                     class="p-2 ml-1 bg-red-600/90 text-white hover:bg-red-500 rounded-md shadow-sm transition-colors">
                     <lucide-icon name="trash" class="w-4 h-4"></lucide-icon>
-                    </button>
+                  </button>
                 }
-                </div>
+              </div>
             </div>
-            } @empty {
+          } @empty {
             <div class="flex flex-col items-center justify-center py-12 px-4 text-zinc-500 text-center">
-                <lucide-icon name="search" class="w-10 h-10 mb-3 opacity-20"></lucide-icon>
-                <p>No se encontraron clientes.</p>
+              <lucide-icon name="search" class="w-10 h-10 mb-3 opacity-20"></lucide-icon>
+              <p>No se encontraron clientes.</p>
             </div>
-            }
+          }
         </div>
-        </div>
+      </div>
     </main>
-    </div>
-    </div>
+
+  </div>
+</div>
