@@ -74,7 +74,7 @@ export class InsumosService {
   updateInsumo(id: string, updateInsumoDto: UpdateInsumoDto) {
     return this.http.patch<Insumo>(`${this.url}/${id}`, updateInsumoDto).subscribe({
       next: (data) => {
-        this.__insumos.update(insumos => insumos.filter(i => i.id !== id));
+        this.__insumos.update(insumos => insumos.filter((i) => i.id !== id));
         this.__insumos.update(insumos => [data, ...insumos]);
         this.ui.showSuccess('Exito', 'Insumo actualizado exitosamente.');
       },
