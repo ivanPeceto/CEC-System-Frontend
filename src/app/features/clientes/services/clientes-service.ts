@@ -49,7 +49,7 @@ export class ClientesService {
       },
       error: (err) => {
         this._isLoading.set(false);
-        this.ui.showError('Error al cargar clientes', err.message || 'Ocurrió un  error inesperado.');
+        this.ui.showError('Error al cargar clientes', err.error.message || 'Ocurrió un  error inesperado.');
       }
     });
   }
@@ -61,7 +61,7 @@ export class ClientesService {
           this._softDeltedClientes.set(data);
         },
         error: (err) => {
-          this.ui.showError('Error al cargar clientes borrados', err.message || 'Ocurrió un error inesperado');
+          this.ui.showError('Error al cargar clientes borrados', err.error.message || 'Ocurrió un error inesperado');
         }
       });
     } else {
@@ -77,7 +77,7 @@ export class ClientesService {
         this.ui.showSuccess('Exito', 'Cliente creado exitosamente.');
       },
       error: (err) => {`${err}`
-        this.ui.showError('Error al crear cliente', err.message || 'Ocurrió un  error inesperado.');
+        this.ui.showError('Error al crear cliente', err.error.message || 'Ocurrió un  error inesperado.');
       },
     });
   }
@@ -91,7 +91,7 @@ export class ClientesService {
         this.ui.showSuccess('Exito', 'Cliente actualizado exitosamente.');
       },
       error: (err) => {
-        this.ui.showError('Error al actualizar cliente', err.message || 'Ocurrió un  error inesperado.');
+        this.ui.showError('Error al actualizar cliente', err.error.message || 'Ocurrió un  error inesperado.');
       },
     });
   }
@@ -110,7 +110,7 @@ export class ClientesService {
         }
       },
       error: (err) => {
-        this.ui.showError('Error al remover cliente', err.message || 'Ocurrió un  error inesperado.')
+        this.ui.showError('Error al remover cliente', err.error.message || 'Ocurrió un  error inesperado.')
       }
     });
   }
@@ -130,7 +130,7 @@ export class ClientesService {
           }
         },
         error: (err) => {
-          this.ui.showError('Error al eliminar definitivamente el cliente', err.message || 'Ocurrió un  error inesperado.');
+          this.ui.showError('Error al eliminar definitivamente el cliente', err.error.message || 'Ocurrió un  error inesperado.');
         }
       });
     } else {
@@ -156,7 +156,7 @@ export class ClientesService {
           }
         },
         error: (err) => {
-          this.ui.showError('Error al restaurar cliente', err.message || 'Ocurrió un  error inesperado.');
+          this.ui.showError('Error al restaurar cliente', err.error.message || 'Ocurrió un  error inesperado.');
         }
       });
     } else {
