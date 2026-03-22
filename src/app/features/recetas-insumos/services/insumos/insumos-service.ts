@@ -52,6 +52,7 @@ export class InsumosService {
     return this.http.get<Insumo[]>(`${this.url}/deleted`).subscribe({
       next: (data) => {
         this.__softDeletedInsumos.set(data);
+        console.log(this.__softDeletedInsumos())
       },
       error: (err) => {
         this.ui.showError('Error al cargar insumos borrados', err.error.message || 'Error inesperado.');
@@ -114,11 +115,8 @@ export class InsumosService {
     }
     return this.http.delete(`${this.url}/${id}/hard`).subscribe({
       next: () => {
-        const insumo = this.__insumos().find((i) => i.id === id);
         this.__insumos.update(insumos => insumos.filter((i) => i.id !== id));
-        if (insumo) {
-          this.__softDeletedInsumos.update(insumos => [insumo, ...insumos]);
-        }
+        this.__softDeletedInsumos.update(insumos => insumos.filter((i) => i.id !== id));
       },
       error: (err) => {
         this.ui.showError('Error al eliminar definitivamente', err.error.message || 'Error inesperado.');
@@ -137,7 +135,7 @@ export class InsumosService {
     }
     return this.http.patch<Insumo>(`${this.url}/restore/${id}`, {}).subscribe({
       next: () => {
-        const insumo = this.__insumos().find((i) => i.id === id);
+        const insumo = this.__softDeletedInsumos().find((i) => i.id === id);
         if (insumo) {
           this.__insumos.update(insumos => [insumo, ...insumos]);
         }
