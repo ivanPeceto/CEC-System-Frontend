@@ -25,6 +25,10 @@ export class RecetasInsumosContainer {
   }
 
   onChangeCurrentModule() {
-    return;
+    if (this.currentModule() === modules.INSUMOS) {
+      this.currentModule.set(modules.RECETAS);
+    } else {
+      this.currentModule.set(modules.INSUMOS);
+    }
   }
 }
