@@ -1,1 +1,211 @@
-<p>recetas-managment works!</p>
+<div class="flex flex-col lg:flex-row gap-6 flex-1 h-full min-h-0 ">
+
+  <aside 
+    class="w-full lg:w-1/3 shrink-0 rounded-xl p-5 h-fit shadow-sm transition-colors duration-300 overflow-y-scroll"
+    [class]="isEditingreceta() 
+      ? 'bg-blue-950/20 border border-blue-900/50' 
+      : 'bg-zinc-900/40 border border-zinc-800/60'"
+  >
+    <h2 
+      class="text-lg font-semibold mb-5 transition-colors"
+      [class]="isEditingreceta() ? 'text-blue-400' : 'text-white'"
+    >
+      {{ isEditingreceta() ? 'Editando Receta' : 'Nueva Receta' }}
+    </h2>
+    
+    <form [formGroup]="recetaForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+      <div class="flex flex-row gap-1.5">
+        <div class="flex flex-col gap-1.5">
+            <label for="nombre" class="text-sm font-medium text-zinc-300">
+            Nombre <span class="text-red-400">*</span>
+            </label>
+            <input 
+            id="nombre" 
+            type="text" 
+            formControlName="nombre"
+            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label for="descripcion" class="text-sm font-medium text-zinc-300">Descripción</label>
+            <input 
+            id="descripcion" 
+            type="text" 
+            formControlName="descripcion"
+            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+        </div>
+      </div>
+
+      <div class="flex flex-row gap-1.5">
+        <div class="flex flex-col gap-1.5">
+          <label for="unidad_medida" class="text-sm font-medium text-zinc-300">
+            Unidad de Medida <span class="text-red-400">*</span>
+          </label>
+          <input 
+            id="unidad_medida" 
+            type="text" 
+            formControlName="unidad_medida"
+            placeholder="Ej: kg, lts, un"
+            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="costo_unidad_medida" class="text-sm font-medium text-zinc-300">
+            Unidades por receta <span class="text-red-400">*</span>
+          </label>
+          <input 
+            id="unidades_por_receta" 
+            type="number" 
+            min="0"
+            step="0.1"
+            formControlName="unidades_por_receta"
+            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-row gap-1.5">
+        <div class="flex flex-col gap-1.5 w-full ">
+          <label for="añadir_subrecetas" class="text-sm font-medium text-zinc-300">
+            Añadir subrecetas <span class="text-red-400">*</span>
+          </label>
+          <button
+            type="button" 
+            id="añadir_subrecetas"
+            (click)="cancelEdit()"
+            class="flex-1 bg-transparent border border-zinc-700 text-zinc-300 font-semibold py-2.5 rounded-lg hover:bg-zinc-800 transition-colors"
+            >
+              Subrecetas: {{3}}
+            </button>
+        </div>
+        <div class="flex flex-col gap-1.5 w-full ">
+          <label for="añadir_insumos" class="text-sm font-medium text-zinc-300">
+            Añadir insumos <span class="text-red-400">*</span>
+          </label>
+          <button
+            type="button" 
+            id="añadir_insumos"
+            (click)="onOpenInsumosModal()"
+            class="flex-1 bg-transparent border border-zinc-700 text-zinc-300 font-semibold py-2.5 rounded-lg hover:bg-zinc-800 transition-colors"
+            [class.bg-blue-900_30]="selectedInsumos().length > 0"
+            [class.border-blue-700]="selectedInsumos().length > 0"
+            >
+              Insumos: {{ selectedInsumos().length }}
+          </button>
+        </div>
+        
+      </div>
+
+      <div class="mt-4 flex gap-3 w-full">
+        @if (isEditingreceta()) {
+          <button 
+            type="button" 
+            (click)="cancelEdit()"
+            class="flex-1 bg-transparent border border-zinc-700 text-zinc-300 font-semibold py-2.5 rounded-lg hover:bg-zinc-800 transition-colors">
+            Cancelar
+          </button>
+        }
+        
+        <button 
+          type="submit" 
+          [disabled]="
+            recetaForm.invalid || 
+            (selectedInsumos().length === 0)
+            "
+          class="flex-1 font-semibold py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          [class]="isEditingreceta() 
+            ? 'bg-blue-600 text-white hover:bg-blue-700 disabled:hover:bg-blue-600' 
+            : 'bg-white text-zinc-950 hover:bg-zinc-200 disabled:hover:bg-white'">
+          {{ isEditingreceta() ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </aside>
+
+  <main class="w-full lg:w-2/3 flex flex-col flex-1 min-h-[400px] lg:min-h-0 bg-zinc-900/20 border border-zinc-800/50 rounded-xl overflow-hidden shadow-sm">
+    
+    <div class="flex flex-row w-full justify-between  px-5 py-2 border-b border-zinc-800/50 bg-zinc-900/40 shrink-0">
+      <div class="flex flex-col h-full justify-center">
+        <h2 class="text-lg font-semibold text-white">Recetas</h2>
+      </div>
+
+      @if (currentUser()?.rol === 'admin') {
+      <button
+        class="flex-1 max-w-xs bg-transparent border border-zinc-700 text-zinc-300 font-semibold py-2.5 rounded-lg hover:bg-zinc-800 transition-colors"
+        type="button" 
+        (click)="onToggleSoftDeleted()"
+      >
+        {{isOnSoftDeletedRecetas()? 'Ver recetas activas' : 'Ver recetas removidas'}}
+      </button>
+      }
+    </div>
+
+    <div class="flex-1 overflow-y-auto">
+      <div class="flex flex-col">
+        @for (receta of filteredrecetas(); track receta.id) {
+          <div class="flex items-center justify-between p-4 border-b border-zinc-800/30 even:bg-zinc-900/30 odd:bg-transparent hover:bg-zinc-800/20 transition-colors">
+            
+            <div class="flex flex-col pr-4">
+              <span class="font-medium text-zinc-100 text-base">{{ receta.nombre }}</span>
+              <span class="text-sm text-zinc-400 mt-0.5">
+                {{ receta.costo_unidad | currency }} x {{ receta.unidad_medida }}
+              </span>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              @if (!isOnSoftDeletedRecetas()) {
+                <button 
+                  (click)="onEdit(receta)" 
+                  title="Editar"
+                  class="p-2 text-blue-400 hover:bg-blue-400/10 hover:text-blue-300 rounded-md transition-colors">
+                  <lucide-icon name="pen" class="w-4 h-4"></lucide-icon>
+                </button>
+                
+                <button 
+                  (click)="onSoftDelete(receta)" 
+                  title="Remover"
+                  class="p-2 text-red-400 hover:bg-red-400/10 hover:text-red-300 rounded-md transition-colors">
+                  <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
+                </button>
+              }
+              @if (isOnSoftDeletedRecetas()) {
+                <button 
+                  (click)="onRestore(receta)" 
+                  title="Restaurar"
+                  class="p-2 ml-1 bg-green-600/90 text-white hover:bg-green-500 rounded-md shadow-sm transition-colors">
+                  <lucide-icon name="history" class="w-4 h-4"></lucide-icon>
+                </button>
+              }
+              
+              @if (currentUser()?.rol === 'admin') {
+                <button 
+                  (click)="onHardDelete(receta)" 
+                  title="Eliminar Definitivamente"
+                  class="p-2 ml-1 bg-red-600/90 text-white hover:bg-red-500 rounded-md shadow-sm transition-colors">
+                  <lucide-icon name="trash" class="w-4 h-4"></lucide-icon>
+                </button>
+              }
+            </div>
+          </div>
+        } @empty {
+          <div class="flex flex-col items-center justify-center py-12 px-4 text-zinc-500 text-center">
+            <lucide-icon name="search" class="w-10 h-10 mb-3 opacity-20"></lucide-icon>
+            <p>No se encontraron recetas.</p>
+          </div>
+        }
+      </div>
+    </div>
+  </main>
+
+</div>
+
+@if (showInsumosModal()) {
+  <app-handle-insumos-modal 
+    [initialSelection]="selectedInsumos()"
+    (save)="onSaveInsumos($event)"
+    (close)="onCloseInsumosModal()">
+  </app-handle-insumos-modal>
+}

@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { InsumosManagment } from '../insumos-managment/insumos-managment';
+import { RecetasManagment } from '../recetas-managment/recetas-managment';
 
 export enum modules {
   RECETAS = 'recetas',
@@ -10,7 +11,7 @@ export enum modules {
 @Component({
   selector: 'app-recetas-insumos-container',
   standalone: true,
-  imports: [LucideAngularModule, InsumosManagment],
+  imports: [LucideAngularModule, InsumosManagment, RecetasManagment],
   templateUrl: './recetas-insumos-container.html',
   styleUrl: './recetas-insumos-container.css',
 })

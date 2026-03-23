@@ -111,11 +111,8 @@ export class RecetasService {
     }
     return this.http.delete(`${this.url}/${id}/hard`).subscribe({
       next: () => {
-        const receta = this.__recetas().find((r) => r.id === id);
         this.__recetas.update(recetas => recetas.filter((r) => r.id !== id));
-        if (receta) {
-          this.__softDeletedRecetas.update(recetas => [receta, ...recetas]);
-        }
+        this.__softDeletedRecetas.update(recetas => recetas.filter((r) => r.id !== id));
       },
       error: (err) => {
         this.ui.showError('Error al eliminar definitivamente', err.error.message || 'Error inesperado.');
@@ -123,7 +120,7 @@ export class RecetasService {
     });
   }
 
-  async restoreInsumo(id: string) {
+  async restoreReceta(id: string) {
     const confirmed = await this.ui.showConfirm('Atención', '¿Está seguro de restaurar la receta?');
     if (!confirmed) {
       return;
@@ -134,7 +131,7 @@ export class RecetasService {
     }
     return this.http.patch<Receta>(`${this.url}/restore/${id}`, {}).subscribe({
       next: () => {
-        const receta = this.__recetas().find((r) => r.id === id);
+        const receta = this.__softDeletedRecetas().find((r) => r.id === id);
         if (receta) {
           this.__recetas.update(recetas => [receta, ...recetas]);
         }

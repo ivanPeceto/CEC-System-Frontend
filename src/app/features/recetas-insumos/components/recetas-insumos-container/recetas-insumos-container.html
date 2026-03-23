@@ -26,5 +26,8 @@
     @if (currentModule() === 'insumos') {
         <app-insumos-managment [searchTerm]="searchQuery()"></app-insumos-managment>
     }
+    @if (currentModule() === 'recetas') {
+        <app-recetas-managment [searchTerm]="searchQuery()"></app-recetas-managment>
+    }
     </div>
 </div>
