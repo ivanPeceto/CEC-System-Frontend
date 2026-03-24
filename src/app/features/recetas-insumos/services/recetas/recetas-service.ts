@@ -31,7 +31,10 @@ export class RecetasService {
   });
 
   constructor () {
-
+    this.loadRecetas();
+    if (this.isAdmin()) {
+      this.loadSoftDeletedRecetas();
+    }
   }
 
   loadRecetas() {

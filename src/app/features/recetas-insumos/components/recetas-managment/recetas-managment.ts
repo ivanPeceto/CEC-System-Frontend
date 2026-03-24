@@ -10,6 +10,8 @@ import { CreateRecetaDto } from '../../../../interfaces/recetas/dto/createReceta
 import { Receta } from '../../../../interfaces/recetas/recetas.interface';
 import { HandleInsumosModal, SelectedInsumoData } from './modals/handle-insumos-modal/handle-insumos-modal';
 import { CreateRecetaInsumoDto } from '../../../../interfaces/recetas/recetaInsumo/dto/createRecetaInsumo.dto';
+import { HandleSubrecetasModal, SelectedRecetaData } from './modals/handle-subrecetas-modal/handle-subrecetas-modal';
+import { CreateRecetaSubrecetaDto } from '../../../../interfaces/recetas/recetaSubreceta/dto/createRecetaSubreceta.dto';
 
 @Component({
   selector: 'app-recetas-managment',
@@ -20,6 +22,7 @@ import { CreateRecetaInsumoDto } from '../../../../interfaces/recetas/recetaInsu
     CommonModule,
     CurrencyPipe,
     HandleInsumosModal,
+    HandleSubrecetasModal,
   ],
   templateUrl: './recetas-managment.html',
   styleUrl: './recetas-managment.css',
@@ -37,6 +40,8 @@ export class RecetasManagment implements OnInit{
 
   showInsumosModal = signal<boolean>(false);
   selectedInsumos = signal<SelectedInsumoData[]>([]);
+  showSubrecetasModal = signal<boolean>(false);
+  selectedSubrecetas = signal<SelectedRecetaData[]>([]);
 
   currentUser = this.authService.currentUser;
   recetas = this.recetasService.recetas;
@@ -81,11 +86,16 @@ export class RecetasManagment implements OnInit{
         cantidad: i.cantidad,
       }));
 
+      const subrecetasDto: CreateRecetaSubrecetaDto[] = this.selectedSubrecetas().map(r => ({
+        subreceta: r.subreceta.id,
+        cantidad: r.cantidad,
+      }));
+
       const payload = {
         ...formValues,
         unidades_por_receta: String(formValues.unidades_por_receta as number),
         insumos: insumosDto,
-        subrecetas: [],
+        subrecetas: subrecetasDto,
       };
 
       if (this.isEditingreceta() && typeof this.editingRecetaId === 'string') {
@@ -98,6 +108,7 @@ export class RecetasManagment implements OnInit{
         this.recetasService.createReceta(dto);
         this.recetaForm.reset();
         this.selectedInsumos.set([]);
+        this.selectedSubrecetas.set([]);
       }
     }
   }
@@ -107,6 +118,7 @@ export class RecetasManagment implements OnInit{
     this.editingRecetaId = null;
     this.recetaForm.reset();
     this.selectedInsumos.set([]);
+    this.selectedSubrecetas.set([]);
   }
 
   onEdit(receta: Receta) {
@@ -126,6 +138,13 @@ export class RecetasManagment implements OnInit{
         cantidad: ri.cantidad,
       }));
       this.selectedInsumos.set(mappedInsumos);
+    }
+    if(receta.subrecetas) {
+      const mappedSubrecetas: SelectedRecetaData[] = receta.subrecetas.map(ri => ({
+        subreceta: ri.subreceta,
+        cantidad: ri.cantidad,
+      }));
+      this.selectedSubrecetas.set(mappedSubrecetas);
     }
   }
 
@@ -156,5 +175,18 @@ export class RecetasManagment implements OnInit{
 
   onCloseInsumosModal() {
     this.showInsumosModal.set(false);
+  }
+
+  onOpenSubrecetasModal() {
+    this.showSubrecetasModal.set(true);
+  }
+
+  onSaveSubrecetas(recetasGuardadas: SelectedRecetaData[]) {
+    this.selectedSubrecetas.set(recetasGuardadas);
+    this.showSubrecetasModal.set(false);
+  }
+
+  onCloseSubrecetasModal() {
+    this.showSubrecetasModal.set(false);
   }
 }

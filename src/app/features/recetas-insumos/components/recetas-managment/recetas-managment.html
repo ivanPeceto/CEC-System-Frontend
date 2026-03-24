@@ -75,10 +75,10 @@
           <button
             type="button" 
             id="añadir_subrecetas"
-            (click)="cancelEdit()"
+            (click)="onOpenSubrecetasModal()"
             class="flex-1 bg-transparent border border-zinc-700 text-zinc-300 font-semibold py-2.5 rounded-lg hover:bg-zinc-800 transition-colors"
             >
-              Subrecetas: {{3}}
+              Subrecetas: {{ selectedSubrecetas().length }}
             </button>
         </div>
         <div class="flex flex-col gap-1.5 w-full ">
@@ -113,7 +113,7 @@
           type="submit" 
           [disabled]="
             recetaForm.invalid || 
-            (selectedInsumos().length === 0)
+            (selectedInsumos().length === 0 && selectedSubrecetas().length === 0) 
             "
           class="flex-1 font-semibold py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           [class]="isEditingreceta() 
@@ -208,4 +208,12 @@
     (save)="onSaveInsumos($event)"
     (close)="onCloseInsumosModal()">
   </app-handle-insumos-modal>
+}
+
+@if (showSubrecetasModal()) {
+  <app-handle-subrecetas-modal 
+    [initialSelection]="selectedSubrecetas()"
+    (save)="onSaveSubrecetas($event)"
+    (close)="onCloseSubrecetasModal()">
+  </app-handle-subrecetas-modal>
 }
