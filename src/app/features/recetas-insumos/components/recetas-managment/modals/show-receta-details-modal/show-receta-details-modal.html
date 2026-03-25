@@ -1,0 +1,128 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4 animate-in fade-in duration-200">
+  
+  @if (receta(); as r) {
+    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] sm:max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-200">
+      
+      <div class="flex items-start sm:items-center justify-between p-4 sm:p-5 border-b border-zinc-800/80 bg-zinc-900/40 shrink-0">
+        <div class="flex flex-col gap-1 pr-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-white leading-tight">{{ r.nombre }}</h2>
+          <span class="text-sm font-medium text-zinc-400">ID: {{ r.id.split('-')[0] }}...</span>
+        </div>
+        <button (click)="onClose()" class="p-2 shrink-0 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+          <lucide-icon name="x" class="w-5 h-5"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-3 sm:p-4 flex flex-col">
+            <span class="text-xs sm:text-sm text-zinc-400 font-medium mb-1">Costo Total</span>
+            <span class="text-lg sm:text-xl font-bold text-emerald-400">{{ r.costo_total | currency }}</span>
+          </div>
+          <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-3 sm:p-4 flex flex-col">
+            <span class="text-xs sm:text-sm text-zinc-400 font-medium mb-1">Rinde</span>
+            <span class="text-lg sm:text-xl font-bold text-white">{{ r.unidades_por_receta }} <span class="text-sm font-normal text-zinc-500">{{ r.unidad_medida }}</span></span>
+          </div>
+          <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-3 sm:p-4 flex flex-col col-span-2 md:col-span-2">
+            <span class="text-xs sm:text-sm text-zinc-400 font-medium mb-1">Costo Unitario (por {{ r.unidad_medida }})</span>
+            <span class="text-lg sm:text-xl font-bold text-blue-400">{{ r.costo_unidad | currency }}</span>
+          </div>
+        </div>
+
+        @if (r.descripcion) {
+          <div class="border border-zinc-800/80 rounded-xl overflow-hidden bg-zinc-900/30 transition-all">
+            <button 
+              (click)="toggleDescription()" 
+              class="w-full flex items-center justify-between p-4 text-left hover:bg-zinc-800/50 transition-colors focus:outline-none"
+            >
+              <div class="flex items-center gap-2">
+                <lucide-icon name="info" class="w-4 h-4 text-zinc-400"></lucide-icon>
+                <span class="font-semibold text-zinc-200">Descripción y Notas</span>
+              </div>
+              <lucide-icon 
+                [name]="isDescriptionExpanded() ? 'chevron-up' : 'chevron-down'" 
+                class="w-5 h-5 text-zinc-500 transition-transform">
+              </lucide-icon>
+            </button>
+            
+            @if (isDescriptionExpanded()) {
+              <div class="p-4 border-t border-zinc-800/80 text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap bg-zinc-900/10">
+                {{ r.descripcion }}
+              </div>
+            }
+          </div>
+        }
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-2 mb-1">
+              <lucide-icon name="box" class="w-5 h-5 text-orange-400"></lucide-icon>
+              <h3 class="text-lg font-semibold text-zinc-100">Insumos ({{ r.insumos.length }})</h3>
+            </div>
+            
+            <div class="flex flex-col gap-2">
+              @for (ri of r.insumos; track ri.id) {
+                <div class="bg-zinc-900/40 border border-zinc-800/60 rounded-lg p-3 flex justify-between items-center hover:bg-zinc-800/40 transition-colors">
+                  <div class="flex flex-col">
+                    <span class="font-medium text-zinc-200">{{ ri.insumo.nombre }}</span>
+                    <span class="text-xs text-zinc-500 mt-0.5">
+                      {{ ri.cantidad }} {{ ri.insumo.unidad_medida }} a {{ ri.insumo.costo_unidad_medida | currency }} c/u
+                    </span>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-semibold text-zinc-300">
+                      {{ (toNumber(ri.cantidad) * toNumber(ri.insumo.costo_unidad_medida)) | currency }}
+                    </span>
+                  </div>
+                </div>
+              } @empty {
+                <div class="text-sm text-zinc-500 italic p-3 border border-dashed border-zinc-800 rounded-lg text-center">
+                  Esta receta no utiliza insumos directos.
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-2 mb-1">
+              <lucide-icon name="layers" class="w-5 h-5 text-purple-400"></lucide-icon>
+              <h3 class="text-lg font-semibold text-zinc-100">Subrecetas ({{ r.subrecetas.length }})</h3>
+            </div>
+            
+            <div class="flex flex-col gap-2">
+              @for (rs of r.subrecetas; track rs.id) {
+                <div class="bg-zinc-900/40 border border-zinc-800/60 rounded-lg p-3 flex justify-between items-center hover:bg-zinc-800/40 transition-colors">
+                  <div class="flex flex-col">
+                    <span class="font-medium text-zinc-200">{{ rs.subreceta.nombre }}</span>
+                    <span class="text-xs text-zinc-500 mt-0.5">
+                      {{ rs.cantidad }} {{ rs.subreceta.unidad_medida }} a {{ rs.subreceta.costo_unidad | currency }} c/u
+                    </span>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-semibold text-zinc-300">
+                      {{ (toNumber(rs.cantidad) * toNumber(rs.subreceta.costo_unidad)) | currency }}
+                    </span>
+                  </div>
+                </div>
+              } @empty {
+                <div class="text-sm text-zinc-500 italic p-3 border border-dashed border-zinc-800 rounded-lg text-center">
+                  Esta receta no utiliza subrecetas.
+                </div>
+              }
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 border-t border-zinc-800/80 bg-zinc-900/40 shrink-0 flex justify-end">
+        <button (click)="onClose()" class="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 font-medium text-white transition-colors">
+          Cerrar Detalles
+        </button>
+      </div>
+
+    </div>
+  }
+</div>

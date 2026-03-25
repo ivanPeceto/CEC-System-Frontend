@@ -12,6 +12,7 @@ import { HandleInsumosModal, SelectedInsumoData } from './modals/handle-insumos-
 import { CreateRecetaInsumoDto } from '../../../../interfaces/recetas/recetaInsumo/dto/createRecetaInsumo.dto';
 import { HandleSubrecetasModal, SelectedRecetaData } from './modals/handle-subrecetas-modal/handle-subrecetas-modal';
 import { CreateRecetaSubrecetaDto } from '../../../../interfaces/recetas/recetaSubreceta/dto/createRecetaSubreceta.dto';
+import { ShowRecetaDetailsModal } from './modals/show-receta-details-modal/show-receta-details-modal';
 
 @Component({
   selector: 'app-recetas-managment',
@@ -23,6 +24,7 @@ import { CreateRecetaSubrecetaDto } from '../../../../interfaces/recetas/recetaS
     CurrencyPipe,
     HandleInsumosModal,
     HandleSubrecetasModal,
+    ShowRecetaDetailsModal,
   ],
   templateUrl: './recetas-managment.html',
   styleUrl: './recetas-managment.css',
@@ -42,6 +44,9 @@ export class RecetasManagment implements OnInit{
   selectedInsumos = signal<SelectedInsumoData[]>([]);
   showSubrecetasModal = signal<boolean>(false);
   selectedSubrecetas = signal<SelectedRecetaData[]>([]);
+
+  showDetailsModal = signal<boolean>(false);
+  selectedRecetaForDetails = signal<Receta | undefined>(undefined);
 
   currentUser = this.authService.currentUser;
   recetas = this.recetasService.recetas;
@@ -188,5 +193,15 @@ export class RecetasManagment implements OnInit{
 
   onCloseSubrecetasModal() {
     this.showSubrecetasModal.set(false);
+  }
+
+  onOpenDetails(receta: Receta) {
+    this.selectedRecetaForDetails.set(receta);
+    this.showDetailsModal.set(true);
+  }
+
+  onCloseDetails() {
+    this.showDetailsModal.set(false);
+    this.selectedRecetaForDetails.set(undefined);
   }
 }

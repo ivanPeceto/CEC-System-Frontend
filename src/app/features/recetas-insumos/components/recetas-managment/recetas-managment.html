@@ -217,3 +217,10 @@
     (close)="onCloseSubrecetasModal()">
   </app-handle-subrecetas-modal>
 }
+
+@if (showDetailsModal()) {
+  <app-show-receta-details-modal 
+    [setReceta]="selectedRecetaForDetails()"
+    (close)="onCloseDetails()">
+  </app-show-receta-details-modal>
+}
