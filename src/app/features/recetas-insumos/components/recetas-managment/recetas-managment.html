@@ -14,8 +14,8 @@
     </h2>
     
     <form [formGroup]="recetaForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
-      <div class="flex flex-row gap-1.5">
-        <div class="flex flex-col gap-1.5">
+      <div class="flex flex-row gap-1.5 w-full">
+        <div class="flex flex-col gap-1.5 w-full">
             <label for="nombre" class="text-sm font-medium text-zinc-300">
             Nombre <span class="text-red-400">*</span>
             </label>
@@ -27,7 +27,7 @@
             />
         </div>
 
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-1.5 w-full">
             <label for="descripcion" class="text-sm font-medium text-zinc-300">Descripción</label>
             <input 
             id="descripcion" 
@@ -38,8 +38,8 @@
         </div>
       </div>
 
-      <div class="flex flex-row gap-1.5">
-        <div class="flex flex-col gap-1.5">
+      <div class="flex flex-row gap-1.5 w-full">
+        <div class="flex flex-col gap-1.5 w-full">
           <label for="unidad_medida" class="text-sm font-medium text-zinc-300">
             Unidad de Medida <span class="text-red-400">*</span>
           </label>
@@ -52,7 +52,7 @@
           />
         </div>
 
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-1.5 w-full">
           <label for="costo_unidad_medida" class="text-sm font-medium text-zinc-300">
             Unidades por receta <span class="text-red-400">*</span>
           </label>
