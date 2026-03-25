@@ -5,6 +5,7 @@ import { Layout } from './core/layout/layout';
 import { Placeholder } from './shared/placeholder/placeholder';
 import { authGuard } from './core/auth/guards/auth-guard';
 import { ClientesManagment } from './features/clientes/components/clientes-managment/clientes-managment';
+import { RecetasInsumosContainer } from './features/recetas-insumos/components/recetas-insumos-container/recetas-insumos-container';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -18,7 +19,7 @@ export const routes: Routes = [
       children: [
         { path: 'pedidos', component: Placeholder },
         { path: 'productos', component: Placeholder },
-        { path: 'recetas', component: Placeholder },
+        { path: 'recetas', component: RecetasInsumosContainer },
         { path: 'clientes', component: ClientesManagment },
       ]
     },

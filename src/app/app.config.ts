@@ -23,6 +23,9 @@ import {
   Info,
   CircleCheck,
   History,
+  X,
+  Plus,
+  Minus,
 } from 'lucide-angular';
 
 export function initializeApp(authService: AuthService) {
@@ -62,6 +65,9 @@ export const appConfig: ApplicationConfig = {
         Info,
         CircleCheck,
         History,
+        X,
+        Plus,
+        Minus,
       })
     ),
   ]
